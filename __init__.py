@@ -1,35 +1,26 @@
-from products import dao
+import cart
+import products
+from cart import get_cart
+import os
+
+def checkout(username):
+    cart = get_cart(username)
+    total = 0
+    for item in cart:
+        total += item.cost
+
+    #Here the exit can happen when a illegal memory is accessed 
+    # or when a error is not handled properly
+    #os._exit(1)
+    return total
 
 
-class Product:
-    def __init__(self, id: int, name: str, description: str, cost: float, qty: int = 0):
-        self.id = id
-        self.name = name
-        self.description = description
-        self.cost = cost
-        self.qty = qty
-
-    def load(data):
-        return Product(data['id'], data['name'], data['description'], data['cost'], data['qty'])
-
-
-def list_products() -> list[Product]:
-    products = dao.list_products()
-    return [Product.load(product) for product in products]
-
-
-
-def get_product(product_id: int) -> Product:
-    return Product.load(dao.get_product(product_id))
-
-
-def add_product(product: dict):
-    dao.add_product(product)
-
-
-def update_qty(product_id: int, qty: int):
-    if qty < 0:
-        raise ValueError('Quantity cannot be negative')
-    dao.update_qty(product_id, qty)
-
+def complete_checkout(username):
+    cartv = cart.get_cart(username)
+    items = cartv
+    for item in items:
+        assert item.qty >= 1
+    for item in items:
+        cart.delete_cart(username)
+        products.update_qty(item.id, item.qty-1)
 
